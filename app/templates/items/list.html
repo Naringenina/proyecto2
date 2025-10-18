@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Inventory · Cards Inventory{% endblock %}
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-4">Inventory</h1>
+
+<form method="get" action="{{ request.url_for('items_page') }}" class="mb-4 flex gap-2">
+  <input
+    type="text"
+    name="q"
+    value="{{ q }}"
+    placeholder="Search by name, set, game..."
+    class="flex-1 border rounded-lg px-3 py-2"
+  />
+  <input type="hidden" name="size" value="{{ size }}" />
+  <button class="px-4 py-2 bg-blue-600 text-white rounded-lg">Search</button>
+  {% if q %}
+    <a href="{{ request.url_for('items_page') }}" class="px-3 py-2 text-gray-700 underline">Clean</a>
+  {% endif %}
+</form>
+
+<div class="mb-3 text-sm text-gray-600">
+  {% if total > 0 %}
+    Showing {{ display_from }}–{{ display_to }} of {{ total }} result{{ 's' if total != 1 }}
+  {% else %}
+    No results found.
+  {% endif %}
+</div>
+
+<div class="overflow-x-auto">
+  <table class="min-w-full bg-white rounded-lg shadow border">
+    <thead class="bg-gray-100 text-left text-sm">
+      <tr>
+        <th class="px-3 py-2">Name</th>
+        <th class="px-3 py-2">Game</th>
+        <th class="px-3 py-2">Set</th>
+        <th class="px-3 py-2">#</th>
+        <th class="px-3 py-2">Rarity</th>
+        <th class="px-3 py-2">Condition</th>
+        <th class="px-3 py-2">Language</th>
+        <th class="px-3 py-2 text-right">Quantity</th>
+        <th class="px-3 py-2">Location</th>
+        <th class="px-3 py-2">Action</th>
+      </tr>
+    </thead>
+    <tbody class="text-sm">
+      {% for it in items %}
+      <tr class="border-t">
+        <td class="px-3 py-2 font-medium">{{ it.name }}</td>
+        <td class="px-3 py-2">{{ it.game }}</td>
+        <td class="px-3 py-2">{{ it.set_name }}</td>
+        <td class="px-3 py-2">{{ it.number_set }}</td>
+        <td class="px-3 py-2">{{ it.rarity.value }}</td>
+        <td class="px-3 py-2">{{ it.condition.value }}</td>
+        <td class="px-3 py-2">{{ it.language.value }}</td>
+        <td class="px-3 py-2 text-right">{{ it.quantity }}</td>
+        <td class="px-3 py-2">{{ it.location or '—' }}</td>
+        <td class="px-3 py-2">
+          <a href="{{ request.url_for('item_detail_page', item_id=it.id) }}" class="text-blue-600 hover:underline">View</a>
+          <span class="mx-1 text-gray-400">·</span>
+          <a href="{{ request.url_for('edit_item_page', item_id=it.id) }}" class="text-blue-600 hover:underline">Edit</a>
+        </td>
+      </tr>
+      {% endfor %}
+      {% if items|length == 0 %}
+      <tr>
+        <td colspan="10" class="px-3 py-6 text-center text-gray-500">No data.</td>
+      </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+{% if total_pages > 1 %}
+<nav class="mt-4 flex items-center gap-2">
+  {% set base = request.url_for('items_page') %}
+  {% set prev_page = page - 1 %}
+  {% set next_page = page + 1 %}
+
+  <a
+    href="{{ base }}?q={{ q }}&page={{ 1 }}&size={{ size }}"
+    class="px-3 py-1 border rounded {{ 'opacity-40 pointer-events-none' if page == 1 }}"
+  >« First</a>
+
+  <a
+    href="{{ base }}?q={{ q }}&page={{ prev_page }}&size={{ size }}"
+    class="px-3 py-1 border rounded {{ 'opacity-40 pointer-events-none' if page == 1 }}"
+  >‹ Previous</a>
+
+  <span class="px-3 py-1 text-sm text-gray-600">Page {{ page }} / {{ total_pages }}</span>
+
+  <a
+    href="{{ base }}?q={{ q }}&page={{ next_page }}&size={{ size }}"
+    class="px-3 py-1 border rounded {{ 'opacity-40 pointer-events-none' if page >= total_pages }}"
+  >Next ›</a>
+
+  <a
+    href="{{ base }}?q={{ q }}&page={{ total_pages }}&size={{ size }}"
+    class="px-3 py-1 border rounded {{ 'opacity-40 pointer-events-none' if page >= total_pages }}"
+  >Last »</a>
+</nav>
+{% endif %}
+
+{% endblock %}

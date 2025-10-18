@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Detalle · Cards Inventory{% endblock %}
+{% block content %}
+
+{% if not item %}
+  <h1 class="text-2xl font-bold mb-4">Item not found</h1>
+  <a href="{{ request.url_for('items_page') }}" class="underline">Back to Inventory</a>
+{% else %}
+  <div class="flex items-start justify-between mb-4">
+    <h1 class="text-2xl font-bold">{{ item.name }}</h1>
+    <div class="flex gap-2">
+      <a href="{{ request.url_for('edit_item_page', item_id=item.id) }}" class="px-3 py-1 bg-blue-600 text-white rounded">Edit</a>
+      <form method="post" action="{{ request.url_for('delete_item', item_id=item.id) }}" onsubmit="return confirm('¿Eliminar definitivamente?');">
+        <button class="px-3 py-1 bg-red-600 text-white rounded">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="md:col-span-2 bg-white border rounded p-4">
+      <dl class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div><dt class="text-gray-500 text-sm">Game</dt><dd class="font-medium">{{ item.game }}</dd></div>
+        <div><dt class="text-gray-500 text-sm">Set</dt><dd class="font-medium">{{ item.set_name }}{% if item.set_code %} ({{ item.set_code }}){% endif %}</dd></div>
+        <div><dt class="text-gray-500 text-sm">Number</dt><dd class="font-medium">{{ item.number_set }}</dd></div>
+        <div><dt class="text-gray-500 text-sm">Rarity</dt><dd class="font-medium">{{ item.rarity.value }}</dd></div>
+        <div><dt class="text-gray-500 text-sm">Language</dt><dd class="font-medium">{{ item.language.value }}</dd></div>
+        <div><dt class="text-gray-500 text-sm">Condition</dt><dd class="font-medium">{{ item.quantity }}</dd></div>
+        <div><dt class="text-gray-500 text-sm">Location</dt><dd class="font-medium">{{ item.location or '—' }}</dd></div>
+        <div><dt class="text-gray-500 text-sm">Comercial Condition</dt><dd class="font-medium">{{ item.comercial_condition.value }}</dd></div>
+        <div><dt class="text-gray-500 text-sm">variant</dt><dd class="font-medium">{{ item.variant or '—' }}</dd></div>
+      </dl>
+      <div class="mt-4">
+        <div class="text-gray-500 text-sm">Notes</div>
+        <div class="whitespace-pre-wrap">{{ item.notes or '—' }}</div>
+      </div>
+    </div>
+
+    <div class="bg-white border rounded p-4">
+      <div class="text-gray-500 text-sm mb-2">Image</div>
+      {% if item.image_path %}
+        <img src="{{ '/media/' ~ item.image_path }}" alt="Imagen de {{ item.name }}" class="rounded shadow">
+      {% else %}
+        <div class="text-gray-500">No imagen.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="mt-6">
+    <a href="{{ request.url_for('items_page') }}" class="underline">Back to inventory</a>
+  </div>
+{% endif %}
+
+{% endblock %}

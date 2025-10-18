@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{% block title %}Cards Inventory{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-900">
+  <header class="bg-white border-b">
+    <nav class="max-w-5xl mx-auto flex flex-wrap items-center gap-4 p-4">
+      <a href="{{ request.url_for('home') }}"
+         class="font-semibold {{ 'text-blue-600' if request.url.path == '/' else 'text-gray-800 hover:text-blue-600' }}">
+         Dashboard
+      </a>
+      <a href="/items" class="{{ 'text-blue-600' if request.url.path.startswith('/items') else 'text-gray-800 hover:text-blue-600' }}">Inventory</a>
+      <a href="/items/new" class="{{ 'text-blue-600' if request.url.path == '/items/new' else 'text-gray-800 hover:text-blue-600' }}">Add</a>
+      <a href="/tags" class="{{ 'text-blue-600' if request.url.path == '/tags' else 'text-gray-800 hover:text-blue-600' }}">Tags</a>
+      <a href="/import" class="{{ 'text-blue-600' if request.url.path == '/import' else 'text-gray-800 hover:text-blue-600' }}">Import</a>
+      <a href="/export" class="{{ 'text-blue-600' if request.url.path == '/export' else 'text-gray-800 hover:text-blue-600' }}">Export</a>
+      <span class="ml-auto text-sm text-gray-500">Cards Inventory</span>
+    </nav>
+  </header>
+
+  <main class="max-w-5xl mx-auto p-4">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

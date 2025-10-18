@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Home· Cards Inventory{% endblock %}
+{% block content %}
+  <h1 class="text-2xl font-bold mb-3">Your Card Manager is alive! 👋</h1>
+  <p class="mb-6 text-gray-700">Start the list or add any Card.</p>
+  <div class="flex gap-3">
+    <a href="/items" class="px-4 py-2 bg-blue-600 text-white rounded-lg">View Inventory</a>
+    <a href="/items/new" class="px-4 py-2 bg-green-600 text-white rounded-lg">Add card</a>
+  </div>
+{% endblock %}

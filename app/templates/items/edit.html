@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Editar carta · Cards Inventory{% endblock %}
+{% block content %}
+
+{% if not item %}
+  <h1 class="text-2xl font-bold mb-4">Item not found</h1>
+  {% if errors and errors|length %}
+    <div class="mb-4 p-3 rounded border border-red-300 bg-red-50 text-red-800">
+      <ul class="list-disc list-inside">
+        {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+  <a href="{{ request.url_for('items_page') }}" class="underline">Back to inventory</a>
+{% else %}
+
+<h1 class="text-2xl font-bold mb-4">Editar: {{ item.name }}</h1>
+
+{% if errors and errors|length %}
+  <div class="mb-4 p-3 rounded border border-red-300 bg-red-50 text-red-800">
+    <ul class="list-disc list-inside">
+      {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+    </ul>
+    {% if existing %}
+      <div class="mt-2 text-sm">
+        Posible duplicated: <strong>{{ existing.name }}</strong> — {{ existing.game }} / {{ existing.set_name }} #{{ existing.number_set }}
+        ({{ existing.language.value }}, {{ existing.condition.value }}, variant: {{ existing.variant or '—' }})
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+
+<form method="post" action="{{ request.url_for('update_item', item_id=item.id) }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div><label class="block text-sm font-medium mb-1">Name</label>
+    <input name="name" value="{{ item.name }}" required class="w-full border rounded px-3 py-2"/>
+  </div>
+  <div><label class="block text-sm font-medium mb-1">Game</label>
+    <input name="game" value="{{ item.game }}" required class="w-full border rounded px-3 py-2"/>
+  </div>
+  <div><label class="block text-sm font-medium mb-1">Set</label>
+    <input name="set_name" value="{{ item.set_name }}" required class="w-full border rounded px-3 py-2"/>
+  </div>
+  <div><label class="block text-sm font-medium mb-1">Set Code</label>
+    <input name="set_code" value="{{ item.set_code or '' }}" class="w-full border rounded px-3 py-2"/>
+  </div>
+  <div><label class="block text-sm font-medium mb-1">Number set</label>
+    <input type="number" min="0" step="1" name="number_set" value="{{ item.number_set }}" required class="w-full border rounded px-3 py-2"/>
+  </div>
+  <div><label class="block text-sm font-medium mb-1">Quantity</label>
+    <input type="number" min="0" step="1" name="quantity" value="{{ item.quantity }}" required class="w-full border rounded px-3 py-2"/>
+  </div>
+
+  <div><label class="block text-sm font-medium mb-1">Rarity</label>
+    <select name="rarity" required class="w-full border rounded px-3 py-2">
+      {% for r in rarities %}
+        {% set val = r.value %}
+        <option value="{{ val }}" {{ 'selected' if item.rarity.value == val else '' }}>{{ val }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div><label class="block text-sm font-medium mb-1">Condition</label>
+    <select name="condition" required class="w-full border rounded px-3 py-2">
+      {% for c in conditions %}
+        {% set val = c.value %}
+        <option value="{{ val }}" {{ 'selected' if item.condition.value == val else '' }}>{{ val }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div><label class="block text-sm font-medium mb-1">Language</label>
+    <select name="language" required class="w-full border rounded px-3 py-2">
+      {% for l in languages %}
+        {% set val = l.value %}
+        <option value="{{ val }}" {{ 'selected' if item.language.value == val else '' }}>{{ val }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div><label class="block text-sm font-medium mb-1">Comer Condition</label>
+    <select name="comercial_condition" class="w-full border rounded px-3 py-2">
+      {% for cc in comercial_conditions %}
+        {% set val = cc.value %}
+        <option value="{{ val }}" {{ 'selected' if item.comercial_condition.value == val else '' }}>{{ val }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="md:col-span-2"><label class="block text-sm font-medium mb-1">Location</label>
+    <input name="location" value="{{ item.location or '' }}" class="w-full border rounded px-3 py-2"/>
+  </div>
+
+  <div><label class="block text-sm font-medium mb-1">Variant</label>
+    <input name="variant" value="{{ item.variant or '' }}" class="w-full border rounded px-3 py-2"/>
+  </div>
+
+  <div class="md:col-span-2"><label class="block text-sm font-medium mb-1">Notes</label>
+    <textarea name="notes" rows="3" class="w-full border rounded px-3 py-2">{{ item.notes or '' }}</textarea>
+  </div>
+
+  <div class="md:col-span-2 flex gap-3 pt-2">
+    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg">Save</button>
+    <a href="{{ request.url_for('item_detail_page', item_id=item.id) }}" class="px-4 py-2 border rounded-lg">Cancel</a>
+  </div>
+</form>
+
+{% endif %}
+{% endblock %}

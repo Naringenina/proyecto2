@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Add Cards· Cards Inventory{% endblock %}
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-4">Add Card</h1>
+
+{% if errors and errors|length %}
+  <div class="mb-4 p-3 rounded border border-red-300 bg-red-50 text-red-800">
+    <ul class="list-disc list-inside">
+      {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+    </ul>
+    {% if existing %}
+      <div class="mt-2 text-sm">
+        Possible duplicated: <strong>{{ existing.name }}</strong> — {{ existing.game }} / {{ existing.set_name }} #{{ existing.number_set }}
+        ({{ existing.language.value }}, {{ existing.condition.value }}, variant: {{ existing.variant or '—' }})
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+
+<form method="post" action="/items" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div>
+    <label class="block text-sm font-medium mb-1">Name</label>
+    <input name="name" value="{{ form.name or '' }}" required class="w-full border rounded px-3 py-2"/>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-1">Game</label>
+    <input name="game" value="{{ form.game or '' }}" required class="w-full border rounded px-3 py-2"/>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-1">Set</label>
+    <input name="set_name" value="{{ form.set_name or '' }}" required class="w-full border rounded px-3 py-2"/>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-1">Set Code (optional)</label>
+    <input name="set_code" value="{{ form.set_code or '' }}" class="w-full border rounded px-3 py-2"/>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-1">Number Set</label>
+    <input type="number" min="0" step="1" name="number_set" value="{{ form.number_set or 0 }}" required class="w-full border rounded px-3 py-2"/>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-1">Quantity</label>
+    <input type="number" min="0" step="1" name="quantity" value="{{ form.quantity or 0 }}" required class="w-full border rounded px-3 py-2"/>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-1">Rarity</label>
+    <select name="rarity" required class="w-full border rounded px-3 py-2">
+      {% for r in rarities %}
+        {% set val = r.value %}
+        <option value="{{ val }}" {{ 'selected' if form.rarity == val else '' }}>{{ val }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-1">Condition</label>
+    <select name="condition" required class="w-full border rounded px-3 py-2">
+      {% for c in conditions %}
+        {% set val = c.value %}
+        <option value="{{ val }}" {{ 'selected' if form.condition == val else '' }}>{{ val }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-1">Language</label>
+    <select name="language" required class="w-full border rounded px-3 py-2">
+      {% for l in languages %}
+        {% set val = l.value %}
+        <option value="{{ val }}" {{ 'selected' if form.language == val else '' }}>{{ val }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-1">Comercial Condition</label>
+    <select name="comercial_condition" class="w-full border rounded px-3 py-2">
+      {% for cc in comercial_conditions %}
+        {% set val = cc.value %}
+        <option value="{{ val }}" {{ 'selected' if form.comercial_condition == val else '' }}>{{ val }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="md:col-span-2">
+    <label class="block text-sm font-medium mb-1">Location (optional)</label>
+    <input name="location" value="{{ form.location or '' }}" class="w-full border rounded px-3 py-2"/>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-1">Variant (optional, ex. “Holo”)</label>
+    <input name="variant" value="{{ form.variant or '' }}" class="w-full border rounded px-3 py-2"/>
+  </div>
+
+  <div class="md:col-span-2">
+    <label class="block text-sm font-medium mb-1">Notes (optional)</label>
+    <textarea name="notes" rows="3" class="w-full border rounded px-3 py-2">{{ form.notes or '' }}</textarea>
+  </div>
+
+  <div class="md:col-span-2 flex gap-3 pt-2">
+    <button class="px-4 py-2 bg-green-600 text-white rounded-lg">Save</button>
+    <a href="{{ request.url_for('items_page') }}" class="px-4 py-2 border rounded-lg">Cancel</a>
+  </div>
+</form>
+
+{% endblock %}
