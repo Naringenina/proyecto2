@@ -1,6 +1,54 @@
-    {% extends "base.html" %}
-    {% block title %}Tags· Cards Inventory{% endblock %}
-    {% block content %}
-    <h1 class="text-2xl font-bold mb-4">Tags</h1>
-    <p class="text-gray-600">Gestión de etiquetas (Paso 7).</p>
-    {% endblock %}
+{% extends "base.html" %}
+{% block title %}Tags · Cards Inventory{% endblock %}
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-4">Tags</h1>
+
+{% if msg %}
+  <div class="mb-3 p-2 bg-green-50 border border-green-300 text-green-800 rounded">{{ msg }}</div>
+{% endif %}
+{% if err %}
+  <div class="mb-3 p-2 bg-red-50 border border-red-300 text-red-800 rounded">{{ err }}</div>
+{% endif %}
+
+<div class="mb-4">
+  <form method="post" action="/tags" class="flex gap-2">
+    <input name="name" placeholder="New tag name" class="border rounded px-3 py-2" required>
+    <button class="px-3 py-2 bg-green-600 text-white rounded">Create</button>
+  </form>
+</div>
+
+<div class="overflow-x-auto">
+  <table class="min-w-full bg-white border rounded">
+    <thead class="bg-gray-100 text-left text-sm">
+      <tr>
+        <th class="px-3 py-2">Name</th>
+        <th class="px-3 py-2"># Items</th>
+        <th class="px-3 py-2">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="text-sm">
+      {% for row in tags %}
+        {% set t = row.tag %}
+        <tr class="border-t">
+          <td class="px-3 py-2 font-medium">{{ t.name }}</td>
+          <td class="px-3 py-2">{{ row.count }}</td>
+          <td class="px-3 py-2">
+            <form method="post" action="/tags/{{ t.id }}/rename" class="inline-flex gap-2">
+              <input name="new_name" value="{{ t.name }}" class="border rounded px-2 py-1">
+              <button class="px-2 py-1 bg-blue-600 text-white rounded">Rename</button>
+            </form>
+            <form method="post" action="/tags/{{ t.id }}/delete" class="inline" onsubmit="return confirm('Delete tag?');">
+              <button class="ml-2 px-2 py-1 bg-red-600 text-white rounded">Delete</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      {% if tags|length == 0 %}
+        <tr><td colspan="3" class="px-3 py-6 text-center text-gray-500">No tags yet.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

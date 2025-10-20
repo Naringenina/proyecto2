@@ -1,6 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Export· Cards Inventory{% endblock %}
+{% block title %}Export · Cards Inventory{% endblock %}
 {% block content %}
-  <h1 class="text-2xl font-bold mb-4">Export</h1>
-  <p class="text-gray-600">Descarga CSV/JSON del inventario (Paso 10).</p>
+
+<h1 class="text-2xl font-bold mb-4">Export</h1>
+
+<p class="mb-4 text-sm text-gray-600">
+  To export, go to the <a href="{{ request.url_for('items_page') }}" class="underline">Inventory</a> page,
+  set your filters and click <em>“Export this filter (CSV)”</em>.
+</p>
+
+<div class="mb-4">
+  <a class="px-3 py-2 bg-gray-800 text-white rounded" href="{{ request.url_for('export_sample_csv') }}">Download sample CSV</a>
+</div>
+
 {% endblock %}
+
+

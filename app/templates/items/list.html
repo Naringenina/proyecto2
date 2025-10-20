@@ -4,26 +4,203 @@
 
 <h1 class="text-2xl font-bold mb-4">Inventory</h1>
 
-<form method="get" action="{{ request.url_for('items_page') }}" class="mb-4 flex gap-2">
-  <input
-    type="text"
-    name="q"
-    value="{{ q }}"
-    placeholder="Search by name, set, game..."
-    class="flex-1 border rounded-lg px-3 py-2"
-  />
+{% if msg %}
+  <div class="mb-3 p-2 bg-green-50 border border-green-300 text-green-800 rounded">{{ msg }}</div>
+{% endif %}
+{% if err %}
+  <div class="mb-3 p-2 bg-red-50 border border-red-300 text-red-800 rounded">{{ err }}</div>
+{% endif %}
+
+<form method="get" action="{{ request.url_for('items_page') }}" class="mb-4 grid md:grid-cols-4 gap-3 items-end">
+  <div class="md:col-span-2">
+    <label class="block text-sm text-gray-600 mb-1">Search</label>
+    <input
+      type="text" name="q" value="{{ q }}" placeholder="Name, set, game, notes…"
+      class="w-full border rounded-lg px-3 py-2"
+    />
+  </div>
+
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">Tag</label>
+    <select name="tag" class="w-full border rounded-lg px-3 py-2">
+      <option value="">(all)</option>
+      {% for t in all_tags %}
+        <option value="{{ t.name }}" {{ 'selected' if tag == t.name else '' }}>{{ t.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">Game contains</label>
+    <input name="game" value="{{ game }}" class="w-full border rounded-lg px-3 py-2" />
+  </div>
+
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">Set contains</label>
+    <input name="set_name" value="{{ set_name }}" class="w-full border rounded-lg px-3 py-2" />
+  </div>
+
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">Rarity</label>
+    <select name="rarity" class="w-full border rounded-lg px-3 py-2">
+      <option value="">(any)</option>
+      {% for r in rarities %}
+        {% set val = r.value %}
+        <option value="{{ val }}" {{ 'selected' if rarity == val else '' }}>{{ val }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">Condition</label>
+    <select name="condition" class="w-full border rounded-lg px-3 py-2">
+      <option value="">(any)</option>
+      {% for c in conditions %}
+        {% set val = c.value %}
+        <option value="{{ val }}" {{ 'selected' if condition == val else '' }}>{{ val }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">Language</label>
+    <select name="language" class="w-full border rounded-lg px-3 py-2">
+      <option value="">(any)</option>
+      {% for l in languages %}
+        {% set val = l.value %}
+        <option value="{{ val }}" {{ 'selected' if language == val else '' }}>{{ val }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">Comercial</label>
+    <select name="comercial_condition" class="w-full border rounded-lg px-3 py-2">
+      <option value="">(any)</option>
+      {% for cc in comercial_conditions %}
+        {% set val = cc.value %}
+        <option value="{{ val }}" {{ 'selected' if comercial_condition == val else '' }}>{{ val }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label class="block text-sm text-gray-600 mb-1"># in set</label>
+    <input type="number" min="0" step="1" name="number_set" value="{{ number_set if number_set is not none else '' }}" class="w-full border rounded-lg px-3 py-2" />
+  </div>
+
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">Qty ≥</label>
+    <input type="number" min="0" step="1" name="quantity_min" value="{{ quantity_min if quantity_min is not none else '' }}" class="w-full border rounded-lg px-3 py-2" />
+  </div>
+
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">Qty ≤</label>
+    <input type="number" min="0" step="1" name="quantity_max" value="{{ quantity_max if quantity_max is not none else '' }}" class="w-full border rounded-lg px-3 py-2" />
+  </div>
+
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">Sort by</label>
+    <select name="sort_by" class="w-full border rounded-lg px-3 py-2">
+      <option value="name" {{ 'selected' if sort_by == 'name' else '' }}>Name</option>
+      <option value="set_name" {{ 'selected' if sort_by == 'set_name' else '' }}>Set</option>
+      <option value="game" {{ 'selected' if sort_by == 'game' else '' }}>Game</option>
+      <option value="quantity" {{ 'selected' if sort_by == 'quantity' else '' }}>Quantity</option>
+      <option value="number_set" {{ 'selected' if sort_by == 'number_set' else '' }}># in set</option>
+      <option value="rarity" {{ 'selected' if sort_by == 'rarity' else '' }}>Rarity</option>
+      <option value="condition" {{ 'selected' if sort_by == 'condition' else '' }}>Condition</option>
+      <option value="language" {{ 'selected' if sort_by == 'language' else '' }}>Language</option>
+    </select>
+  </div>
+
+  <div>
+    <label class="block text-sm text-gray-600 mb-1">Direction</label>
+    <select name="sort_dir" class="w-full border rounded-lg px-3 py-2">
+      <option value="asc" {{ 'selected' if sort_dir == 'asc' else '' }}>Asc</option>
+      <option value="desc" {{ 'selected' if sort_dir == 'desc' else '' }}>Desc</option>
+    </select>
+  </div>
+
   <input type="hidden" name="size" value="{{ size }}" />
-  <button class="px-4 py-2 bg-blue-600 text-white rounded-lg">Search</button>
-  {% if q %}
-    <a href="{{ request.url_for('items_page') }}" class="px-3 py-2 text-gray-700 underline">Clean</a>
-  {% endif %}
+  <div class="md:col-span-4 flex gap-2">
+    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg">Apply</button>
+    <a href="{{ request.url_for('items_page') }}" class="px-4 py-2 border rounded-lg">Clear</a>
+  </div>
+</form>
+
+{% set export_params = [] %}
+{% if q %}{% set _ = export_params.append('q=' ~ (q|urlencode)) %}{% endif %}
+{% if tag %}{% set _ = export_params.append('tag=' ~ (tag|urlencode)) %}{% endif %}
+{% if game %}{% set _ = export_params.append('game=' ~ (game|urlencode)) %}{% endif %}
+{% if set_name %}{% set _ = export_params.append('set_name=' ~ (set_name|urlencode)) %}{% endif %}
+{% if rarity %}{% set _ = export_params.append('rarity=' ~ (rarity|urlencode)) %}{% endif %}
+{% if condition %}{% set _ = export_params.append('condition=' ~ (condition|urlencode)) %}{% endif %}
+{% if language %}{% set _ = export_params.append('language=' ~ (language|urlencode)) %}{% endif %}
+{% if comercial_condition %}{% set _ = export_params.append('comercial_condition=' ~ (comercial_condition|urlencode)) %}{% endif %}
+{% if number_set is not none %}{% set _ = export_params.append('number_set=' ~ number_set) %}{% endif %}
+{% if quantity_min is not none %}{% set _ = export_params.append('quantity_min=' ~ quantity_min) %}{% endif %}
+{% if quantity_max is not none %}{% set _ = export_params.append('quantity_max=' ~ quantity_max) %}{% endif %}
+
+<div class="mb-4 flex flex-wrap gap-3 items-center">
+  <a
+    class="px-3 py-2 bg-green-600 text-white rounded"
+    href="{{ request.url_for('export_csv') }}{% if export_params %}?{{ export_params|join('&') }}{% endif %}"
+  >
+    Export this filter (CSV)
+  </a>
+</div>
+
+<form id="bulkForm" method="post" class="mb-4 flex flex-wrap items-end gap-3">
+  <input type="hidden" name="return_to" value="{{ request.url }}">
+
+  <div class="flex items-center gap-2">
+    <label class="text-sm text-gray-600">Adjust Qty by</label>
+    <input type="number" name="delta" value="1" class="w-24 border rounded px-2 py-1">
+    <button
+      class="px-3 py-2 bg-blue-600 text-white rounded"
+      formaction="{{ request.url_for('bulk_adjust_qty') }}"
+    >Apply</button>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <label class="text-sm text-gray-600">Set status</label>
+    <select name="status_value" class="border rounded px-2 py-1">
+      {% for cc in comercial_conditions %}<option value="{{ cc.value }}">{{ cc.value }}</option>{% endfor %}
+    </select>
+    <button
+      class="px-3 py-2 bg-indigo-600 text-white rounded"
+      formaction="{{ request.url_for('bulk_set_status') }}"
+    >Update</button>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <label class="text-sm text-gray-600">Tag</label>
+    <input name="tag_name" placeholder="tag name" class="border rounded px-2 py-1">
+    <button
+      class="px-3 py-2 bg-emerald-600 text-white rounded"
+      formaction="{{ request.url_for('bulk_add_tag') }}"
+    >Add</button>
+    <button
+      class="px-3 py-2 bg-amber-600 text-white rounded"
+      formaction="{{ request.url_for('bulk_remove_tag') }}"
+    >Remove</button>
+  </div>
+
+  <div class="flex-1"></div>
+
+  <button
+    type="submit"
+    class="px-3 py-2 bg-red-600 text-white rounded"
+    formaction="{{ request.url_for('bulk_delete') }}"
+    onclick="return confirm('Delete selected items?');"
+  >Delete selected</button>
 </form>
 
 <div class="mb-3 text-sm text-gray-600">
   {% if total > 0 %}
     Showing {{ display_from }}–{{ display_to }} of {{ total }} result{{ 's' if total != 1 }}
   {% else %}
-    No results found.
+    No results.
   {% endif %}
 </div>
 
@@ -31,6 +208,10 @@
   <table class="min-w-full bg-white rounded-lg shadow border">
     <thead class="bg-gray-100 text-left text-sm">
       <tr>
+        <th class="px-3 py-2">
+          <input type="checkbox" id="checkAll">
+        </th>
+        <th class="px-3 py-2">Img</th>
         <th class="px-3 py-2">Name</th>
         <th class="px-3 py-2">Game</th>
         <th class="px-3 py-2">Set</th>
@@ -38,14 +219,32 @@
         <th class="px-3 py-2">Rarity</th>
         <th class="px-3 py-2">Condition</th>
         <th class="px-3 py-2">Language</th>
-        <th class="px-3 py-2 text-right">Quantity</th>
+        <th class="px-3 py-2 text-right">Qty</th>
         <th class="px-3 py-2">Location</th>
-        <th class="px-3 py-2">Action</th>
+        <th class="px-3 py-2">Actions</th>
       </tr>
     </thead>
     <tbody class="text-sm">
       {% for it in items %}
-      <tr class="border-t">
+      <tr class="border-t align-top">
+        <td class="px-3 py-2">
+          <input type="checkbox" name="ids" form="bulkForm" value="{{ it.id }}" class="rowChk">
+        </td>
+        <td class="px-3 py-2">
+          {% if it.image_path %}
+            {% set th = it.image_path | thumb_path %}
+            <a href="{{ request.url_for('item_detail_page', item_id=it.id) }}" class="block w-14 h-14 rounded border bg-gray-50 overflow-hidden">
+              <img
+                src="{{ '/media/' ~ (th if th else it.image_path) }}"
+                alt="Thumb of {{ it.name }}"
+                class="w-full h-full object-contain"
+                loading="lazy"
+              >
+            </a>
+          {% else %}
+            <div class="w-14 h-14 rounded border bg-gray-50 flex items-center justify-center text-gray-400">—</div>
+          {% endif %}
+        </td>
         <td class="px-3 py-2 font-medium">{{ it.name }}</td>
         <td class="px-3 py-2">{{ it.game }}</td>
         <td class="px-3 py-2">{{ it.set_name }}</td>
@@ -64,7 +263,7 @@
       {% endfor %}
       {% if items|length == 0 %}
       <tr>
-        <td colspan="10" class="px-3 py-6 text-center text-gray-500">No data.</td>
+        <td colspan="12" class="px-3 py-6 text-center text-gray-500">Empty.</td>
       </tr>
       {% endif %}
     </tbody>
@@ -72,33 +271,40 @@
 </div>
 
 {% if total_pages > 1 %}
-<nav class="mt-4 flex items-center gap-2">
+
   {% set base = request.url_for('items_page') %}
-  {% set prev_page = page - 1 %}
-  {% set next_page = page + 1 %}
-
-  <a
-    href="{{ base }}?q={{ q }}&page={{ 1 }}&size={{ size }}"
-    class="px-3 py-1 border rounded {{ 'opacity-40 pointer-events-none' if page == 1 }}"
-  >« First</a>
-
-  <a
-    href="{{ base }}?q={{ q }}&page={{ prev_page }}&size={{ size }}"
-    class="px-3 py-1 border rounded {{ 'opacity-40 pointer-events-none' if page == 1 }}"
-  >‹ Previous</a>
-
+  {% set qp = "q=" ~ q
+              ~ "&tag=" ~ tag
+              ~ "&game=" ~ (game|urlencode)
+              ~ "&set_name=" ~ (set_name|urlencode)
+              ~ "&rarity=" ~ (rarity|urlencode)
+              ~ "&condition=" ~ (condition|urlencode)
+              ~ "&language=" ~ (language|urlencode)
+              ~ "&comercial_condition=" ~ (comercial_condition|urlencode)
+              ~ "&number_set=" ~ (number_set if number_set is not none else '')
+              ~ "&quantity_min=" ~ (quantity_min if quantity_min is not none else '')
+              ~ "&quantity_max=" ~ (quantity_max if quantity_max is not none else '')
+              ~ "&sort_by=" ~ sort_by
+              ~ "&sort_dir=" ~ sort_dir
+              ~ "&size=" ~ size
+            %}
+<nav class="mt-4 flex items-center gap-2">
+  <a href="{{ base }}?{{ qp }}&page=1" class="px-3 py-1 border rounded {{ 'opacity-40 pointer-events-none' if page == 1 }}">« First</a>
+  <a href="{{ base }}?{{ qp }}&page={{ page-1 }}" class="px-3 py-1 border rounded {{ 'opacity-40 pointer-events-none' if page == 1 }}">‹ Prev</a>
   <span class="px-3 py-1 text-sm text-gray-600">Page {{ page }} / {{ total_pages }}</span>
-
-  <a
-    href="{{ base }}?q={{ q }}&page={{ next_page }}&size={{ size }}"
-    class="px-3 py-1 border rounded {{ 'opacity-40 pointer-events-none' if page >= total_pages }}"
-  >Next ›</a>
-
-  <a
-    href="{{ base }}?q={{ q }}&page={{ total_pages }}&size={{ size }}"
-    class="px-3 py-1 border rounded {{ 'opacity-40 pointer-events-none' if page >= total_pages }}"
-  >Last »</a>
+  <a href="{{ base }}?{{ qp }}&page={{ page+1 }}" class="px-3 py-1 border rounded {{ 'opacity-40 pointer-events-none' if page >= total_pages }}">Next ›</a>
+  <a href="{{ base }}?{{ qp }}&page={{ total_pages }}" class="px-3 py-1 border rounded {{ 'opacity-40 pointer-events-none' if page >= total_pages }}">Last »</a>
 </nav>
 {% endif %}
+
+<script>
+  const checkAll = document.getElementById('checkAll');
+  const rowChks = document.querySelectorAll('.rowChk');
+  if (checkAll) {
+    checkAll.addEventListener('change', (e) => {
+      rowChks.forEach(ch => ch.checked = e.target.checked);
+    });
+  }
+</script>
 
 {% endblock %}
